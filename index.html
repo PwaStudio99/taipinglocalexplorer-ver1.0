@@ -1,0 +1,1307 @@
+<!DOCTYPE html>
+<html lang="ms">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+  <title>Taiping Explorer — Google Street View 360° Edition</title>
+  <meta name="theme-color" content="#f0f7ff">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800&family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/tone/14.8.49/Tone.min.js"></script>
+
+  <style>
+    :root{--sky-primary:#0284c7;--sky-deep:#0369a1;--sky-light:#e0f2fe;--sky-soft:#f0f9ff;--mint-accent:#10b981;--mint-soft:#ecfdf5;--sand-gold:#f59e0b;--bg-canvas:#f6f9fc;--surface-card:#ffffff;--surface-translucent:rgba(255,255,255,.82);--glass-nav:rgba(255,255,255,.85);--glass-border:rgba(255,255,255,.95);--text-main:#0f172a;--text-muted:#64748b;--text-subtle:#94a3b8;--border-subtle:#e2e8f0;--shadow-ambient:0 4px 20px -2px rgba(2,132,199,.06),0 2px 6px -1px rgba(15,23,42,.04);--shadow-float:0 18px 40px -6px rgba(2,132,199,.16),0 6px 16px rgba(15,23,42,.05);--shadow-dock:0 20px 45px rgba(15,23,42,.15),0 1px 3px rgba(15,23,42,.05);--radius-md:18px;--radius-lg:24px;--radius-xl:32px;--ease-spring:cubic-bezier(0.175,0.885,0.32,1.275);--ease-fluid:cubic-bezier(0.16,1,0.3,1)}
+    [data-theme="dark"]{--bg-canvas:#090e17;--surface-card:#131c2a;--surface-translucent:rgba(19,28,42,.88);--glass-nav:rgba(13,20,31,.88);--glass-border:rgba(255,255,255,.08);--text-main:#f8fafc;--text-muted:#94a3b8;--text-subtle:#64748b;--border-subtle:#1e293b;--sky-soft:#0c1929;--mint-soft:#082318;--shadow-ambient:0 6px 20px rgba(0,0,0,.4);--shadow-float:0 18px 42px rgba(0,0,0,.65);--shadow-dock:0 20px 45px rgba(0,0,0,.8)}
+    *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent;user-select:none}
+    input,textarea{user-select:text}
+    body{font-family:'Plus Jakarta Sans',-apple-system,BlinkMacSystemFont,sans-serif;background-color:var(--bg-canvas);color:var(--text-main);line-height:1.5;overflow-x:hidden;min-height:100vh;display:flex;flex-direction:column;transition:background-color .45s var(--ease-fluid),color .45s var(--ease-fluid);background-image:radial-gradient(circle at 10% 10%,rgba(2,132,199,.07) 0,transparent 45%),radial-gradient(circle at 90% 80%,rgba(16,185,129,.07) 0,transparent 45%)}
+    .font-editorial{font-family:'Outfit',sans-serif}
+    .ambient-glow{position:fixed;border-radius:50%;filter:blur(120px);pointer-events:none;z-index:0;opacity:.65;animation:pulseAura 12s ease-in-out infinite alternate}
+    .ambient-glow-1{top:-120px;right:-80px;width:420px;height:420px;background:radial-gradient(circle,#bae6fd,transparent 70%)}
+    .ambient-glow-2{top:45%;left:-140px;width:440px;height:440px;background:radial-gradient(circle,#a7f3d0,transparent 70%);opacity:.4;animation-delay:-6s}
+    @keyframes pulseAura{0%{transform:scale(1) translate(0,0)}100%{transform:scale(1.15) translate(20px,30px)}}
+    .app-header{position:sticky;top:0;z-index:1000;background:var(--glass-nav);backdrop-filter:blur(24px) saturate(180%);-webkit-backdrop-filter:blur(24px) saturate(180%);border-bottom:1px solid var(--border-subtle);padding:12px 20px;display:flex;align-items:center;justify-content:space-between;transition:all .3s var(--ease-fluid)}
+    .location-badge-wrap{display:flex;align-items:center;gap:12px;cursor:pointer;transition:transform .25s var(--ease-spring)}
+    .location-badge-wrap:active{transform:scale(.96)}
+    .location-avatar-pill{width:42px;height:42px;border-radius:15px;background:linear-gradient(135deg,var(--sky-primary),#38bdf8);color:#fff;display:flex;align-items:center;justify-content:center;font-size:1.15rem;box-shadow:0 4px 14px rgba(2,132,199,.3)}
+    .location-title{font-size:.72rem;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--text-muted);display:flex;align-items:center;gap:6px}
+    .location-city{font-size:1.05rem;font-weight:800;color:var(--text-main);display:flex;align-items:center;gap:6px}
+    .live-pulse{width:9px;height:9px;border-radius:50%;background:var(--mint-accent);box-shadow:0 0 0 0 rgba(16,185,129,.65);animation:pulseGreen 2s cubic-bezier(.4,0,.6,1) infinite}
+    @keyframes pulseGreen{0%{box-shadow:0 0 0 0 rgba(16,185,129,.75)}70%{box-shadow:0 0 0 9px rgba(16,185,129,0)}100%{box-shadow:0 0 0 0 rgba(16,185,129,0)}}
+    .header-actions{display:flex;align-items:center;gap:8px}
+    .glass-action-btn{height:40px;padding:0 14px;border-radius:14px;background:var(--surface-card);border:1px solid var(--border-subtle);color:var(--text-main);display:inline-flex;align-items:center;justify-content:center;gap:7px;font-size:.86rem;font-weight:700;cursor:pointer;box-shadow:var(--shadow-ambient);transition:all .28s var(--ease-spring);position:relative;font-family:inherit}
+    .glass-action-btn.icon-only{width:40px;padding:0}
+    .glass-action-btn:hover{transform:translateY(-2px);box-shadow:var(--shadow-float);border-color:var(--sky-primary)}
+    .glass-action-btn:active{transform:scale(.94)}
+    .user-pill-btn{background:var(--sky-soft);border:1.5px solid rgba(2,132,199,.3);color:var(--sky-primary)}
+    .user-pill-btn:hover{background:var(--sky-primary);color:#fff}
+    .app-main{flex:1;width:100%;max-width:980px;margin:0 auto;padding:16px 20px 120px;position:relative;z-index:1}
+    .view-screen{display:none;opacity:0;transform:translateY(14px) scale(.99);transition:opacity .35s var(--ease-fluid),transform .35s var(--ease-fluid)}
+    .view-screen.active{display:block;opacity:1;transform:translateY(0) scale(1)}
+    .fresh-hero-card{background:linear-gradient(135deg,rgba(2,132,199,.09) 0,rgba(16,185,129,.09) 100%),var(--surface-card);border:1.5px solid rgba(255,255,255,.85);border-radius:var(--radius-xl);padding:26px;box-shadow:var(--shadow-float);margin-bottom:26px;position:relative;overflow:hidden;backdrop-filter:blur(16px)}
+    .greeting-line{font-size:.85rem;font-weight:700;color:var(--sky-primary);text-transform:uppercase;letter-spacing:.06em;margin-bottom:6px;display:flex;align-items:center;gap:6px}
+    .hero-big-title{font-size:clamp(1.65rem,4.2vw,2.3rem);font-weight:800;line-height:1.2;color:var(--text-main);margin-bottom:12px;letter-spacing:-.025em}
+    .weather-pill-fresh{display:inline-flex;align-items:center;gap:9px;padding:7px 16px;border-radius:30px;background:var(--surface-translucent);border:1px solid var(--border-subtle);font-size:.82rem;font-weight:700;color:var(--text-main);margin-bottom:18px;box-shadow:var(--shadow-ambient);cursor:pointer;transition:all .3s var(--ease-spring)}
+    .weather-pill-fresh:hover{transform:scale(1.04) translateY(-2px)}
+    .search-bar-glass{position:relative;display:flex;align-items:center;background:var(--surface-card);border:1.5px solid var(--border-subtle);border-radius:var(--radius-lg);padding:6px 8px 6px 18px;box-shadow:var(--shadow-ambient);transition:all .3s var(--ease-fluid)}
+    .search-bar-glass:focus-within{border-color:var(--sky-primary);box-shadow:0 0 0 5px rgba(2,132,199,.16)}
+    .search-input{flex:1;border:none;background:transparent;outline:none;font-family:inherit;font-size:.95rem;color:var(--text-main)}
+    .search-submit-btn{width:44px;height:44px;border-radius:16px;background:linear-gradient(135deg,var(--sky-primary),var(--sky-deep));color:#fff;border:none;display:flex;align-items:center;justify-content:center;cursor:pointer;box-shadow:0 4px 14px rgba(2,132,199,.35);transition:all .28s var(--ease-spring)}
+    .search-submit-btn:active{transform:scale(.92)}
+    .section-title-wrap{display:flex;align-items:center;justify-content:space-between;margin-bottom:16px}
+    .section-title-clean{font-size:1.28rem;font-weight:800;color:var(--text-main);letter-spacing:-.015em;display:flex;align-items:center;gap:9px}
+    .section-action-link{font-size:.83rem;font-weight:700;color:var(--sky-primary);cursor:pointer;text-decoration:none;transition:all .25s var(--ease-spring);display:inline-flex;align-items:center;gap:4px}
+    .category-scroll-strip{display:flex;gap:12px;overflow-x:auto;padding-bottom:8px;margin-bottom:24px;scrollbar-width:none;-webkit-overflow-scrolling:touch}
+    .category-scroll-strip::-webkit-scrollbar{display:none}
+    .category-pill{flex:0 0 auto;display:flex;align-items:center;gap:8px;padding:10px 18px;border-radius:30px;background:var(--surface-card);border:1px solid var(--border-subtle);font-size:.85rem;font-weight:700;color:var(--text-muted);cursor:pointer;transition:all .3s var(--ease-spring);box-shadow:var(--shadow-ambient);font-family:inherit}
+    .category-pill.active{background:linear-gradient(135deg,var(--sky-primary),var(--sky-deep));color:#fff;border-color:var(--sky-primary)}
+    .category-pill.active-sv{background:linear-gradient(135deg,#ea4335,#c5221f);color:#fff;border-color:#ea4335}
+    .cards-flow-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:24px;margin-bottom:32px}
+    .editorial-travel-card{background:var(--surface-card);border-radius:var(--radius-lg);border:1px solid var(--border-subtle);overflow:hidden;box-shadow:var(--shadow-ambient);display:flex;flex-direction:column;transition:all .38s var(--ease-spring);position:relative;cursor:pointer}
+    .editorial-travel-card:hover{transform:translateY(-8px) scale(1.015);box-shadow:var(--shadow-float)}
+    .card-photo-wrapper{position:relative;height:200px;overflow:hidden;background:#e2e8f0}
+    .card-photo-img{width:100%;height:100%;object-fit:cover;transition:transform .75s var(--ease-fluid)}
+    .card-tag-pill{position:absolute;top:14px;left:14px;background:rgba(15,23,42,.75);backdrop-filter:blur(12px);color:#fff;padding:4px 12px;border-radius:20px;font-size:.7rem;font-weight:800;letter-spacing:.06em;text-transform:uppercase;border:1px solid rgba(255,255,255,.35)}
+    .card-bookmark-btn{position:absolute;top:14px;right:14px;width:38px;height:38px;border-radius:50%;background:rgba(255,255,255,.92);backdrop-filter:blur(10px);border:none;display:flex;align-items:center;justify-content:center;color:#64748b;cursor:pointer;box-shadow:0 4px 14px rgba(0,0,0,.15);transition:all .3s var(--ease-spring);z-index:5;font-size:1rem}
+    .card-bookmark-btn.saved{color:#ef4444;background:#fff}
+    .card-distance-badge{position:absolute;bottom:12px;left:14px;background:rgba(255,255,255,.94);backdrop-filter:blur(10px);color:var(--text-main);padding:4px 11px;border-radius:20px;font-size:.73rem;font-weight:800;display:inline-flex;align-items:center;gap:5px}
+    .card-content-body{padding:18px;display:flex;flex-direction:column;flex:1}
+    .card-meta-line{display:flex;align-items:center;justify-content:space-between;margin-bottom:6px;font-size:.8rem}
+    .rating-pill-gold{display:inline-flex;align-items:center;gap:4px;font-weight:800;color:#d97706}
+    .card-title-h3{font-size:1.18rem;font-weight:800;color:var(--text-main);margin-bottom:6px;line-height:1.3}
+    .card-desc-snippet{font-size:.86rem;color:var(--text-muted);line-height:1.5;margin-bottom:16px;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;flex:1}
+    .card-foot-line{display:flex;align-items:center;justify-content:space-between;border-top:1px solid var(--border-subtle);padding-top:12px;font-size:.83rem}
+    .card-price-txt{font-weight:800;color:var(--sky-primary)}
+    .card-tap-detail{font-weight:800;color:var(--text-muted);display:inline-flex;align-items:center;gap:5px}
+    .glass-modal-sheet{position:fixed;inset:0;background:rgba(15,23,42,.65);backdrop-filter:blur(18px);z-index:3000;display:none;align-items:flex-end;justify-content:center;opacity:0;transition:opacity .35s var(--ease-fluid)}
+    @media(min-width:640px){.glass-modal-sheet{align-items:center;padding:24px}}
+    .glass-modal-sheet.open{display:flex;opacity:1}
+    .sheet-inner-card{background:var(--surface-card);border-radius:var(--radius-xl) var(--radius-xl) 0 0;width:100%;max-width:560px;max-height:90vh;overflow-y:auto;box-shadow:var(--shadow-float);position:relative;border:1px solid var(--border-subtle);transform:translateY(100%);transition:transform .4s var(--ease-spring)}
+    @media(min-width:640px){.sheet-inner-card{border-radius:var(--radius-xl);transform:translateY(30px) scale(.95)}}
+    .glass-modal-sheet.open .sheet-inner-card{transform:translateY(0) scale(1)}
+    .sheet-drag-handle{width:44px;height:5px;border-radius:10px;background:var(--border-subtle);margin:12px auto 6px}
+    .sheet-close-btn{position:absolute;top:16px;right:16px;width:38px;height:38px;border-radius:50%;background:rgba(255,255,255,.88);backdrop-filter:blur(12px);color:var(--text-main);border:1px solid var(--border-subtle);display:flex;align-items:center;justify-content:center;font-size:1.25rem;cursor:pointer;z-index:25;transition:all .28s var(--ease-spring)}
+    [data-theme="dark"] .sheet-close-btn{background:rgba(19,28,42,.85)}
+    .glass-auth-container{position:relative;background:linear-gradient(135deg,rgba(255,255,255,.8),rgba(255,255,255,.45));backdrop-filter:blur(30px) saturate(200%);border:1.5px solid rgba(255,255,255,.9);border-radius:30px;box-shadow:0 25px 50px -12px rgba(2,132,199,.22);padding:30px 24px;overflow:hidden}
+    [data-theme="dark"] .glass-auth-container{background:linear-gradient(135deg,rgba(19,28,42,.9),rgba(15,23,42,.7));border:1.5px solid rgba(255,255,255,.12)}
+    .auth-bg-blob{position:absolute;border-radius:50%;filter:blur(45px);pointer-events:none;z-index:0;opacity:.55;animation:floatSmoothBlob 7s ease-in-out infinite alternate}
+    .auth-blob-1{width:190px;height:190px;top:-45px;right:-35px;background:radial-gradient(circle,#38bdf8,#0284c7)}
+    .auth-blob-2{width:180px;height:180px;bottom:-35px;left:-35px;background:radial-gradient(circle,#34d399,#059669);animation-delay:-3.5s}
+    @keyframes floatSmoothBlob{0%{transform:translate(0,0) scale(1)}100%{transform:translate(18px,20px) scale(1.12)}}
+    .auth-tab-switch{position:relative;z-index:2;display:flex;background:rgba(255,255,255,.5);backdrop-filter:blur(14px);border-radius:20px;padding:5px;gap:6px;margin-bottom:22px;border:1px solid rgba(255,255,255,.75)}
+    [data-theme="dark"] .auth-tab-switch{background:rgba(15,23,42,.55);border:1px solid rgba(255,255,255,.08)}
+    .auth-tab-btn{flex:1;padding:10px 12px;border-radius:16px;border:none;background:transparent;font-family:inherit;font-weight:700;font-size:.85rem;color:var(--text-muted);cursor:pointer;transition:all .3s var(--ease-spring)}
+    .auth-tab-btn.active{background:var(--surface-card);color:var(--sky-primary);box-shadow:0 4px 14px rgba(2,132,199,.2)}
+    .auth-input-group{margin-bottom:16px;text-align:left;position:relative;z-index:2}
+    .auth-label{display:block;font-size:.82rem;font-weight:700;margin-bottom:6px;color:var(--text-main)}
+    .auth-input-field{width:100%;padding:13px 18px;border-radius:16px;border:1.5px solid var(--border-subtle);background:rgba(255,255,255,.75);font-family:inherit;font-size:.94rem;color:var(--text-main);outline:none;transition:all .3s var(--ease-spring)}
+    [data-theme="dark"] .auth-input-field{background:rgba(15,23,42,.65);border-color:rgba(255,255,255,.1)}
+    .auth-input-field:focus{border-color:var(--sky-primary);background:var(--surface-card);box-shadow:0 0 0 4px rgba(2,132,199,.18)}
+    .password-input-wrap{position:relative}
+    .password-input-wrap .toggle-pwd-btn{position:absolute;right:12px;top:50%;transform:translateY(-50%);background:none;border:none;color:var(--text-muted);cursor:pointer;font-size:1rem;padding:8px}
+    .auth-flow-view{display:none;position:relative;z-index:2}
+    .auth-flow-view.active{display:block;animation:glassFadeIn .35s var(--ease-spring)}
+    @keyframes glassFadeIn{from{opacity:0;transform:translateY(12px) scale(.97)}to{opacity:1;transform:translateY(0) scale(1)}}
+    .pill-btn-fresh{display:inline-flex;align-items:center;justify-content:center;gap:8px;padding:13px 24px;border-radius:30px;border:none;font-size:.9rem;font-weight:700;cursor:pointer;transition:all .3s var(--ease-spring);box-shadow:var(--shadow-ambient);text-decoration:none;font-family:inherit}
+    .pill-btn-fresh.sky{background:linear-gradient(135deg,var(--sky-primary),var(--sky-deep));color:#fff}
+    .pill-btn-fresh.mint{background:linear-gradient(135deg,var(--mint-accent),#059669);color:#fff}
+    .pill-btn-fresh.google-red{background:linear-gradient(135deg,#ea4335,#c5221f);color:#fff}
+    .pill-btn-fresh.danger{background:linear-gradient(135deg,#ef4444,#dc2626);color:#fff}
+    .pill-btn-fresh.white{background:var(--surface-card);border:1.5px solid var(--border-subtle);color:var(--text-main)}
+    .pill-btn-fresh:active{transform:scale(.95)}
+    .floating-glass-dock{position:fixed;bottom:20px;left:50%;transform:translateX(-50%);z-index:2000;width:calc(100% - 36px);max-width:480px;background:var(--glass-nav);backdrop-filter:blur(28px) saturate(180%);border:1.5px solid var(--glass-border);border-radius:38px;padding:8px 12px;display:flex;justify-content:space-between;align-items:center;box-shadow:var(--shadow-dock)}
+    .dock-tab-btn{flex:1;background:transparent;border:none;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;color:var(--text-muted);cursor:pointer;font-size:.72rem;font-weight:700;padding:8px 0;border-radius:22px;transition:all .3s var(--ease-spring);font-family:inherit}
+    .dock-tab-btn i{font-size:1.25rem}
+    .dock-tab-btn.active{color:var(--sky-primary);background:rgba(2,132,199,.12)}
+    .streetview-wrapper{position:relative;width:100%;height:480px;background:#0b111e;border-radius:0 0 var(--radius-xl) var(--radius-xl);overflow:hidden}
+    .streetview-iframe{width:100%;height:100%;border:none;display:block}
+    .streetview-overlay-hud{position:absolute;top:14px;left:14px;z-index:10;display:flex;align-items:center;gap:8px;background:rgba(15,23,42,.78);backdrop-filter:blur(12px);padding:7px 14px;border-radius:30px;color:#fff;font-size:.78rem;font-weight:800;border:1px solid rgba(255,255,255,.2)}
+    .streetview-controls-bar{position:absolute;bottom:16px;right:16px;z-index:15;display:flex;gap:8px;flex-wrap:wrap}
+    #celebration-canvas{position:fixed;inset:0;pointer-events:none;z-index:9999}
+    .toast-pill-hud{position:fixed;top:24px;left:50%;transform:translateX(-50%) translateY(-60px) scale(.9);background:var(--text-main);color:#fff;padding:12px 26px;border-radius:40px;font-size:.88rem;font-weight:700;box-shadow:var(--shadow-float);z-index:5000;opacity:0;pointer-events:none;transition:all .38s var(--ease-spring);display:flex;align-items:center;gap:10px}
+    .toast-pill-hud.show{opacity:1;transform:translateX(-50%) translateY(0) scale(1)}
+  </style>
+</head>
+<body data-theme="light">
+
+  <canvas id="celebration-canvas"></canvas>
+  <div class="ambient-glow ambient-glow-1"></div>
+  <div class="ambient-glow ambient-glow-2"></div>
+
+  <header class="app-header">
+    <div class="location-badge-wrap" onclick="requestGpsUpdate()">
+      <div class="location-avatar-pill"><i class="fa-solid fa-compass"></i></div>
+      <div>
+        <div class="location-title"><span class="live-pulse"></span><span id="txt-location-status">Lokasi Terkini</span></div>
+        <div class="location-city"><span id="user-location-name">Taiping, Perak</span><i class="fa-solid fa-angle-down" style="font-size:.75rem;color:var(--text-subtle);"></i></div>
+      </div>
+    </div>
+    <div class="header-actions">
+      <button class="glass-action-btn icon-only" id="theme-btn" onclick="toggleTheme()"><i class="fa-solid fa-moon"></i></button>
+      <button class="glass-action-btn icon-only" id="lang-btn" onclick="toggleLanguage()"><span style="font-size:.75rem;font-weight:800;">EN</span></button>
+      <button class="glass-action-btn user-pill-btn" id="header-auth-btn" onclick="handleHeaderAuthClick()">
+        <i class="fa-regular fa-user" id="header-auth-icon"></i>
+        <span id="header-auth-label">Log Masuk</span>
+      </button>
+    </div>
+  </header>
+
+  <div class="toast-pill-hud" id="global-toast">
+    <i class="fa-solid fa-circle-check" style="color:var(--mint-accent);"></i>
+    <span id="toast-text">Selamat Datang ke Taiping Explorer!</span>
+  </div>
+
+  <main class="app-main">
+
+    <section class="view-screen active" id="view-home">
+      <div class="fresh-hero-card">
+        <div class="greeting-line font-editorial"><i class="fa-solid fa-sparkles"></i> <span id="hero-greeting">Selamat Pagi, Pengembara!</span></div>
+        <h1 class="hero-big-title font-editorial" id="hero-headline">Discover Taiping, Naturally.</h1>
+        <p style="font-size:.92rem;color:var(--text-muted);margin-bottom:18px;line-height:1.55;">Terokai pepohon hujan berusia 140 tahun, hirup udara segar puncak Maxwell Hill & nikmati pemandangan 360° Google Street View.</p>
+        <div class="weather-pill-fresh" onclick="cycleWeatherSimulation()">
+          <i class="fa-solid fa-cloud-sun" style="color:var(--sky-primary);" id="weather-icon"></i>
+          <span id="weather-temp">25°C</span><span style="color:var(--text-subtle);">•</span>
+          <span id="weather-desc">Cerah & Segar di Tasik</span>
+        </div>
+        <div class="search-bar-glass">
+          <i class="fa-solid fa-magnifying-glass" style="color:var(--text-subtle);margin-right:12px;"></i>
+          <input type="text" class="search-input" id="home-search-box" placeholder="Cari taman tasik, mee udang, kopitiam..." oninput="handleLiveSearch(this.value)">
+          <button class="search-submit-btn" onclick="executeSearchAction()"><i class="fa-solid fa-arrow-right"></i></button>
+        </div>
+      </div>
+
+      <div class="section-title-wrap">
+        <h2 class="section-title-clean font-editorial"><i class="fa-solid fa-shapes" style="color:var(--sky-primary);"></i> Teroka Kategori</h2>
+        <span class="section-action-link" onclick="switchDockTab('explore')">Semua Destinasi →</span>
+      </div>
+      <div class="category-scroll-strip" id="home-categories-strip">
+        <button class="category-pill active" onclick="filterByHomeCategory('all', this)"><i class="fa-solid fa-border-all"></i> Semua</button>
+        <button class="category-pill" onclick="filterByHomeCategory('nature', this)"><i class="fa-solid fa-leaf"></i> Nature</button>
+        <button class="category-pill" onclick="filterByHomeCategory('heritage', this)"><i class="fa-solid fa-landmark"></i> Warisan</button>
+        <button class="category-pill" onclick="filterByHomeCategory('food', this)"><i class="fa-solid fa-utensils"></i> Makanan</button>
+        <button class="category-pill" onclick="filterByHomeCategory('cafe', this)"><i class="fa-solid fa-mug-saucer"></i> Kafe OOTD</button>
+        <button class="category-pill" onclick="filterByHomeCategory('family', this)"><i class="fa-solid fa-people-roof"></i> Rekreasi</button>
+      </div>
+
+      <div class="section-title-wrap">
+        <h2 class="section-title-clean font-editorial"><i class="fa-solid fa-star" style="color:var(--sand-gold);"></i> Destinasi Pilihan Teratas</h2>
+        <span class="section-action-link" onclick="sortByNearGps()"><i class="fa-solid fa-location-crosshairs"></i> Paling Dekat (GPS)</span>
+      </div>
+      <div class="cards-flow-grid" id="home-featured-grid"></div>
+
+      <div style="background:var(--surface-card);border-radius:var(--radius-xl);padding:26px;border:1px solid var(--border-subtle);box-shadow:var(--shadow-ambient);margin-bottom:28px;">
+        <div class="section-title-wrap" style="margin-bottom:12px;">
+          <h3 class="section-title-clean" style="font-size:1.18rem;"><i class="fa-solid fa-gem" style="color:#0284c7;"></i> Permata Tersembunyi (Hidden Gems)</h3>
+          <button class="pill-btn-fresh mint" style="padding:7px 16px;font-size:.78rem;" onclick="openSuggestGemSheet()"><i class="fa-solid fa-plus"></i> Cadang Port</button>
+        </div>
+        <p style="font-size:.88rem;color:var(--text-muted);margin-bottom:18px;">Lokasi rahsia penduduk tempatan Taiping yang damai dan menawan.</p>
+        <div id="hidden-gems-list" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:16px;"></div>
+      </div>
+    </section>
+
+    <section class="view-screen" id="view-explore">
+      <div class="section-title-wrap" style="margin-bottom:20px;">
+        <div>
+          <h1 class="section-title-clean font-editorial" style="font-size:1.65rem;"><i class="fa-solid fa-compass"></i> Teroka Taiping</h1>
+          <p style="font-size:.88rem;color:var(--text-muted);">Direktori lengkap tarikan alam semula jadi, taman tasik dan warisan.</p>
+        </div>
+      </div>
+      <div style="display:flex;gap:12px;margin-bottom:22px;flex-wrap:wrap;">
+        <select id="explore-filter-cat" class="search-bar-glass" style="width:auto;padding:11px 18px;" onchange="applyExploreDirectoryFilters()">
+          <option value="all">Semua Kategori</option>
+          <option value="nature">🌿 Alam Semula Jadi</option>
+          <option value="heritage">🏛️ Warisan Sejarah</option>
+          <option value="food">🍜 Makanan & Kopitiam</option>
+          <option value="cafe">☕ Kafe Artisanal</option>
+          <option value="family">👨‍👩‍👧 Rekreasi Keluarga</option>
+        </select>
+        <select id="explore-sort-type" class="search-bar-glass" style="width:auto;padding:11px 18px;" onchange="applyExploreDirectoryFilters()">
+          <option value="rating">Rating Tertinggi ★</option>
+          <option value="distance">Jarak Paling Dekat</option>
+          <option value="free">Kemasukan Percuma Sahaja</option>
+        </select>
+      </div>
+      <div class="cards-flow-grid" id="explore-directory-grid"></div>
+    </section>
+
+    <section class="view-screen" id="view-map">
+      <div class="section-title-wrap" style="margin-bottom:14px;">
+        <div>
+          <h1 class="section-title-clean font-editorial" style="font-size:1.65rem;"><i class="fa-solid fa-street-view" style="color:#ea4335;"></i> Google Street View 360°</h1>
+          <p style="font-size:.88rem;color:var(--text-muted);">Terokai pemandangan 360 darjah jalan raya & keindahan Taiping.</p>
+        </div>
+      </div>
+      <div style="background:var(--surface-card);border-radius:var(--radius-xl);border:1px solid var(--border-subtle);overflow:hidden;box-shadow:var(--shadow-ambient);">
+        <div style="padding:12px 18px;background:var(--sky-soft);display:flex;gap:8px;overflow-x:auto;border-bottom:1px solid var(--border-subtle);align-items:center;" id="streetview-hotspots-bar">
+          <!-- Hotspots akan dijana secara dinamik dari Firebase -->
+        </div>
+        <div style="display:flex;justify-content:space-between;align-items:center;padding:12px 18px;background:var(--surface-card);border-bottom:1px solid var(--border-subtle);flex-wrap:wrap;gap:10px;">
+          <div style="display:flex;align-items:center;gap:8px;">
+            <i class="fa-solid fa-location-dot" style="color:#ea4335;"></i>
+            <span style="font-size:.92rem;font-weight:800;" id="sv-current-placename">Taman Tasik Taiping</span>
+          </div>
+          <div style="display:flex;gap:6px;">
+            <button class="pill-btn-fresh google-red" style="padding:6px 14px;font-size:.75rem;" id="btn-mode-sv" onclick="switchGoogleViewMode('streetview')"><i class="fa-solid fa-street-view"></i> Street View</button>
+            <button class="pill-btn-fresh white" style="padding:6px 14px;font-size:.75rem;" id="btn-mode-map" onclick="switchGoogleViewMode('map')"><i class="fa-solid fa-map"></i> Peta</button>
+            <button class="pill-btn-fresh white" style="padding:6px 14px;font-size:.75rem;" id="btn-mode-sat" onclick="switchGoogleViewMode('satellite')"><i class="fa-solid fa-earth-americas"></i> Satelit</button>
+          </div>
+        </div>
+        <div class="streetview-wrapper">
+          <iframe id="google-sv-viewport" class="streetview-iframe" src="https://maps.google.com/maps?layer=c&cbll=4.8569,100.7497&source=embed&output=svembed" allowfullscreen loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe>
+          <div class="streetview-overlay-hud"><i class="fa-solid fa-compass" style="color:var(--sand-gold);"></i><span>Putar & Seret Skrin untuk Pandangan 360°</span></div>
+          <div class="streetview-controls-bar">
+            <a id="btn-open-full-google" href="https://www.google.com/maps/@?api=1&map_action=pano&viewpoint=4.8569,100.7497" target="_blank" rel="noopener noreferrer" class="pill-btn-fresh sky" style="padding:8px 16px;font-size:.8rem;"><i class="fa-solid fa-arrow-up-right-from-square"></i> Buka Penuh Google Maps</a>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="view-screen" id="view-saved">
+      <div class="section-title-wrap" style="margin-bottom:16px;">
+        <div>
+          <h1 class="section-title-clean font-editorial" style="font-size:1.65rem;"><i class="fa-solid fa-heart" style="color:#ef4444;"></i> Tempat Kegemaran</h1>
+          <p style="font-size:.88rem;color:var(--text-muted);">Senarai destinasi pilihan yang anda simpan.</p>
+        </div>
+      </div>
+      <div class="cards-flow-grid" id="saved-bookmarks-grid"></div>
+    </section>
+
+    <section class="view-screen" id="view-profile">
+      <div style="background:linear-gradient(135deg,var(--sky-deep),#0c4a6e);color:#fff;border-radius:var(--radius-xl);padding:28px;box-shadow:var(--shadow-float);margin-bottom:24px;position:relative;overflow:hidden;">
+        <div style="display:flex;justify-content:space-between;align-items:flex-start;flex-wrap:wrap;gap:12px;">
+          <div>
+            <div style="font-size:.74rem;letter-spacing:.09em;text-transform:uppercase;color:var(--sky-light);">PASPORT DIGITAL PENJELAJAH 2026</div>
+            <h2 class="font-editorial" id="passport-user-name" style="font-size:1.75rem;margin-top:4px;">Pengembara Tetamu</h2>
+            <div id="passport-user-email" style="font-size:.82rem;opacity:.85;margin-top:2px;">(Mod Tetamu — Sila daftar akaun)</div>
+          </div>
+          <span class="pill-btn-fresh mint" id="user-rank-badge" style="padding:6px 16px;font-size:.76rem;">Tahap 1: Novis Alam 🎒</span>
+        </div>
+        <p style="font-size:.86rem;opacity:.92;margin:16px 0 22px;max-width:480px;line-height:1.55;">Kumpul cop digital di setiap mercu tanda Taiping untuk melengkapkan pasport!</p>
+        <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(85px,1fr));gap:12px;" id="profile-stamps-grid"></div>
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-top:24px;flex-wrap:wrap;gap:12px;">
+          <div style="font-size:.88rem;"><span id="stamp-count-display" style="font-weight:800;font-size:1.15rem;color:var(--sand-gold);">0</span> / 6 Mercu Tanda Dilawati</div>
+          <button class="pill-btn-fresh sky" style="background:#fff;color:var(--sky-deep);" onclick="openCheckInSheet()"><i class="fa-solid fa-qrcode"></i> Check-In Cop Lokasi</button>
+        </div>
+      </div>
+
+      <div style="background:var(--surface-card);border-radius:var(--radius-xl);padding:24px;border:1px solid var(--border-subtle);box-shadow:var(--shadow-ambient);margin-bottom:24px;">
+        <h3 class="section-title-clean" style="font-size:1.12rem;margin-bottom:16px;"><i class="fa-solid fa-id-card" style="color:var(--sky-primary);"></i> Maklumat Akaun</h3>
+        <div id="profile-guest-card" style="text-align:center;padding:16px 0;">
+          <p style="font-size:.9rem;color:var(--text-muted);margin-bottom:18px;">Anda melayari sebagai <strong>Tetamu</strong>. Daftar akaun untuk menyegerakkan mercu tanda kegemaran & cop pasport di Firebase.</p>
+          <div style="display:flex;justify-content:center;gap:12px;flex-wrap:wrap;">
+            <button class="pill-btn-fresh sky" onclick="openAuthModal('login')"><i class="fa-solid fa-right-to-bracket"></i> Log Masuk</button>
+            <button class="pill-btn-fresh mint" onclick="openAuthModal('register')"><i class="fa-solid fa-user-plus"></i> Daftar Akaun</button>
+          </div>
+        </div>
+        <div id="profile-logged-card" style="display:none;">
+          <div style="display:flex;align-items:center;gap:16px;margin-bottom:16px;padding-bottom:16px;border-bottom:1px solid var(--border-subtle);">
+            <div style="width:54px;height:54px;border-radius:50%;background:linear-gradient(135deg,var(--sky-primary),var(--mint-accent));color:#fff;display:flex;align-items:center;justify-content:center;font-size:1.45rem;font-weight:800;" id="user-avatar-text">P</div>
+            <div>
+              <div style="font-weight:800;font-size:1.08rem;" id="logged-user-fullname">Nama Pengguna</div>
+              <div style="font-size:.84rem;color:var(--text-muted);" id="logged-user-email">email@example.com</div>
+              <div style="font-size:.75rem;color:var(--mint-accent);font-weight:700;margin-top:2px;">● Akaun Aktif di Firebase</div>
+            </div>
+          </div>
+          <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px;">
+            <button class="pill-btn-fresh white" style="font-size:.82rem;padding:9px 18px;" onclick="openAuthModal('reset')"><i class="fa-solid fa-key"></i> Tukar Kata Laluan</button>
+            <button class="pill-btn-fresh danger" style="font-size:.82rem;padding:9px 18px;" onclick="performLogout()"><i class="fa-solid fa-arrow-right-from-bracket"></i> Log Keluar</button>
+          </div>
+        </div>
+      </div>
+
+      <div style="background:var(--surface-card);border-radius:var(--radius-xl);padding:24px;border:1px solid var(--border-subtle);box-shadow:var(--shadow-ambient);">
+        <h3 class="section-title-clean" style="font-size:1.12rem;margin-bottom:16px;"><i class="fa-solid fa-sliders"></i> Tetapan</h3>
+        <div style="display:flex;flex-direction:column;gap:12px;font-size:.9rem;">
+          <div style="display:flex;justify-content:space-between;align-items:center;padding:10px 0;border-bottom:1px solid var(--border-subtle);">
+            <span><i class="fa-solid fa-bell" style="color:var(--sky-primary);margin-right:8px;"></i> Notifikasi Cuaca</span>
+            <input type="checkbox" checked style="accent-color:var(--sky-primary);width:18px;height:18px;">
+          </div>
+          <div style="display:flex;justify-content:space-between;align-items:center;padding:10px 0;">
+            <span><i class="fa-solid fa-volume-high" style="color:var(--sand-gold);margin-right:8px;"></i> Kesan Bunyi</span>
+            <input type="checkbox" id="toggle-sound-fx" checked style="accent-color:var(--sky-primary);width:18px;height:18px;">
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <!-- AUTH MODAL -->
+  <div class="glass-modal-sheet" id="auth-modal-sheet">
+    <div class="sheet-inner-card glass-auth-container">
+      <div class="sheet-drag-handle"></div>
+      <button class="sheet-close-btn" onclick="closeAuthModal()">&times;</button>
+      <div class="auth-bg-blob auth-blob-1"></div>
+      <div class="auth-bg-blob auth-blob-2"></div>
+      <div style="text-align:center;margin-bottom:22px;position:relative;z-index:2;">
+        <div style="width:64px;height:64px;border-radius:22px;background:linear-gradient(135deg,var(--sky-primary),var(--mint-accent));color:#fff;display:inline-flex;align-items:center;justify-content:center;font-size:1.7rem;margin-bottom:12px;">
+          <i class="fa-solid fa-shield-halved"></i>
+        </div>
+        <h3 class="font-editorial" id="auth-modal-headline" style="font-size:1.6rem;font-weight:800;">Akaun Pengembara</h3>
+        <p style="font-size:.86rem;color:var(--text-muted);margin-top:4px;" id="auth-modal-subline">Sambungkan ke akaun rasmi Taiping Explorer.</p>
+      </div>
+      <div class="auth-tab-switch">
+        <button class="auth-tab-btn active" id="auth-tab-btn-login" onclick="switchAuthFlow('login')">Log Masuk</button>
+        <button class="auth-tab-btn" id="auth-tab-btn-register" onclick="switchAuthFlow('register')">Daftar</button>
+        <button class="auth-tab-btn" id="auth-tab-btn-reset" onclick="switchAuthFlow('reset')">Lupa Password</button>
+      </div>
+
+      <div class="auth-flow-view active" id="auth-flow-login">
+        <form onsubmit="handleFormLogin(event)">
+          <div class="auth-input-group">
+            <label class="auth-label">Emel Berdaftar</label>
+            <input type="email" id="login-email" class="auth-input-field" placeholder="contoh: explorer@taiping.my" required>
+          </div>
+          <div class="auth-input-group">
+            <label class="auth-label">Kata Laluan</label>
+            <div class="password-input-wrap">
+              <input type="password" id="login-password" class="auth-input-field" placeholder="Kata laluan" required>
+              <button type="button" class="toggle-pwd-btn" onclick="togglePasswordVisibility('login-password', this)"><i class="fa-regular fa-eye"></i></button>
+            </div>
+          </div>
+          <button type="submit" id="btn-submit-login" class="pill-btn-fresh sky" style="width:100%;justify-content:center;padding:14px;">
+            <i class="fa-solid fa-right-to-bracket"></i> <span>Log Masuk</span>
+          </button>
+        </form>
+        <div style="text-align:center;margin-top:20px;font-size:.85rem;color:var(--text-muted);">
+          Belum ada akaun? <a href="javascript:void(0)" onclick="switchAuthFlow('register')" style="color:var(--sky-primary);font-weight:800;text-decoration:none;">Daftar di sini</a>
+        </div>
+      </div>
+
+      <div class="auth-flow-view" id="auth-flow-register">
+        <form onsubmit="handleFormRegister(event)">
+          <div class="auth-input-group">
+            <label class="auth-label">Nama Penuh</label>
+            <input type="text" id="reg-name" class="auth-input-field" placeholder="Nama anda" required>
+          </div>
+          <div class="auth-input-group">
+            <label class="auth-label">Alamat Emel</label>
+            <input type="email" id="reg-email" class="auth-input-field" placeholder="emel@domain.com" required>
+          </div>
+          <div class="auth-input-group">
+            <label class="auth-label">Kata Laluan (Min 6)</label>
+            <div class="password-input-wrap">
+              <input type="password" id="reg-password" class="auth-input-field" placeholder="Kata laluan" minlength="6" required>
+              <button type="button" class="toggle-pwd-btn" onclick="togglePasswordVisibility('reg-password', this)"><i class="fa-regular fa-eye"></i></button>
+            </div>
+          </div>
+          <div class="auth-input-group">
+            <label class="auth-label">Sahkan Kata Laluan</label>
+            <div class="password-input-wrap">
+              <input type="password" id="reg-confirm-password" class="auth-input-field" placeholder="Ulang kata laluan" minlength="6" required>
+              <button type="button" class="toggle-pwd-btn" onclick="togglePasswordVisibility('reg-confirm-password', this)"><i class="fa-regular fa-eye"></i></button>
+            </div>
+          </div>
+          <button type="submit" id="btn-submit-reg" class="pill-btn-fresh mint" style="width:100%;justify-content:center;padding:14px;">
+            <i class="fa-solid fa-user-plus"></i> <span>Cipta Akaun</span>
+          </button>
+        </form>
+      </div>
+
+      <div class="auth-flow-view" id="auth-flow-reset">
+        <div style="background:rgba(2,132,199,.1);border:1px solid rgba(2,132,199,.25);border-radius:16px;padding:14px;font-size:.85rem;color:var(--sky-deep);margin-bottom:18px;">
+          <i class="fa-solid fa-circle-info"></i> Pautan reset akan dihantar ke emel anda melalui Firebase.
+        </div>
+        <form onsubmit="handleRequestPasswordReset(event)">
+          <div class="auth-input-group">
+            <label class="auth-label">Emel Akaun</label>
+            <input type="email" id="reset-email" class="auth-input-field" placeholder="Emel anda" required>
+          </div>
+          <button type="submit" id="btn-submit-reset" class="pill-btn-fresh sky" style="width:100%;justify-content:center;padding:14px;">
+            <i class="fa-solid fa-paper-plane"></i> <span>Hantar Pautan Reset</span>
+          </button>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <!-- BOTTOM NAV -->
+  <nav class="floating-glass-dock">
+    <button class="dock-tab-btn active" id="tab-home" onclick="switchDockTab('home')"><i class="fa-solid fa-house"></i><span>Home</span></button>
+    <button class="dock-tab-btn" id="tab-explore" onclick="switchDockTab('explore')"><i class="fa-solid fa-compass"></i><span>Explore</span></button>
+    <button class="dock-tab-btn" id="tab-map" onclick="switchDockTab('map')"><i class="fa-solid fa-street-view"></i><span>Street View</span></button>
+    <button class="dock-tab-btn" id="tab-saved" onclick="switchDockTab('saved')"><i class="fa-solid fa-bookmark"></i><span>Saved</span></button>
+    <button class="dock-tab-btn" id="tab-profile" onclick="switchDockTab('profile')"><i class="fa-solid fa-user"></i><span>Profile</span></button>
+  </nav>
+
+  <!-- DETAIL SHEET -->
+  <div class="glass-modal-sheet" id="detail-sheet">
+    <div class="sheet-inner-card">
+      <div class="sheet-drag-handle"></div>
+      <button class="sheet-close-btn" onclick="closeDetailSheet()">&times;</button>
+      <div style="height:250px;position:relative;overflow:hidden;">
+        <img id="detail-img" src="" alt="Place hero" style="width:100%;height:100%;object-fit:cover;">
+        <div id="detail-category-badge" class="card-tag-pill">NATURE</div>
+      </div>
+      <div style="padding:24px;">
+        <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:12px;gap:10px;">
+          <div>
+            <h2 id="detail-title" style="font-size:1.55rem;font-weight:800;line-height:1.25;">Nama Destinasi</h2>
+            <div style="font-size:.83rem;color:var(--text-muted);display:flex;align-items:center;gap:6px;margin-top:4px;">
+              <i class="fa-solid fa-location-dot" style="color:var(--sky-primary);"></i> <span id="detail-distance">1.2 km</span>
+            </div>
+          </div>
+          <div style="text-align:right;">
+            <div id="detail-rating" style="font-size:1.25rem;font-weight:800;color:#d97706;">★ 4.9</div>
+            <div id="detail-price" style="font-size:.84rem;font-weight:800;color:var(--sky-primary);">Percuma</div>
+          </div>
+        </div>
+        <p id="detail-desc" style="font-size:.93rem;line-height:1.6;margin-bottom:20px;">Penerangan.</p>
+        <div style="background:var(--bg-canvas);border-radius:var(--radius-md);padding:16px;margin-bottom:22px;font-size:.86rem;display:flex;flex-direction:column;gap:9px;border:1px solid var(--border-subtle);">
+          <div><strong><i class="fa-solid fa-clock" style="color:var(--sky-primary);"></i> Waktu:</strong> <span id="detail-hours">6:00 AM - 10:00 PM</span></div>
+          <div><strong><i class="fa-solid fa-lightbulb" style="color:var(--sand-gold);"></i> Tips:</strong> <span id="detail-tips">Tips.</span></div>
+        </div>
+        <div style="display:flex;gap:10px;flex-wrap:wrap;">
+          <button class="pill-btn-fresh google-red" style="flex:1;min-width:140px;" onclick="viewDetailPlaceInStreetView()"><i class="fa-solid fa-street-view"></i> Lihat 360°</button>
+          <button class="pill-btn-fresh sky" style="flex:1;min-width:140px;" onclick="openGoogleMapsDirection()"><i class="fa-solid fa-diamond-turn-right"></i> Arah</button>
+          <button class="pill-btn-fresh mint" onclick="sharePlaceDetails()"><i class="fa-solid fa-share-nodes"></i> Kongsi</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- CHECKIN SHEET -->
+  <div class="glass-modal-sheet" id="checkin-sheet">
+    <div class="sheet-inner-card" style="padding:28px 24px;text-align:center;">
+      <div class="sheet-drag-handle"></div>
+      <button class="sheet-close-btn" onclick="closeCheckInSheet()">&times;</button>
+      <div style="width:72px;height:72px;border-radius:50%;background:var(--sky-soft);color:var(--sky-primary);display:flex;align-items:center;justify-content:center;margin:0 auto 16px;font-size:2.2rem;"><i class="fa-solid fa-stamp"></i></div>
+      <h3 style="font-size:1.45rem;font-weight:800;margin-bottom:8px;">Cop Pasport Lokasi</h3>
+      <p style="font-size:.88rem;color:var(--text-muted);margin-bottom:20px;">Pilih mercu tanda yang anda lawati untuk menambah cop digital.</p>
+      <select id="select-checkpoint" class="search-bar-glass" style="width:100%;padding:13px 18px;margin-bottom:22px;">
+        <option value="tasik">Taman Tasik Taiping</option>
+        <option value="muzium">Muzium Perak Taiping</option>
+        <option value="bukit_larut">Bukit Larut / Maxwell Hill</option>
+        <option value="zoo">Zoo Taiping & Night Safari</option>
+        <option value="antong">Kilang Kopi Antong (1933)</option>
+        <option value="burmese">Burmese Pool Waterfall</option>
+      </select>
+      <button class="pill-btn-fresh sky" style="width:100%;justify-content:center;padding:15px;" onclick="claimDigitalStamp()"><i class="fa-solid fa-circle-check"></i> Sahkan & Cop Sekarang!</button>
+    </div>
+  </div>
+
+  <!-- GEM SHEET -->
+  <div class="glass-modal-sheet" id="suggest-gem-sheet">
+    <div class="sheet-inner-card" style="padding:28px 24px;">
+      <div class="sheet-drag-handle"></div>
+      <button class="sheet-close-btn" onclick="closeSuggestGemSheet()">&times;</button>
+      <h3 style="font-size:1.4rem;font-weight:800;margin-bottom:8px;"><i class="fa-solid fa-gem" style="color:#0284c7;"></i> Cadang Port Rahsia</h3>
+      <p style="font-size:.86rem;color:var(--text-muted);margin-bottom:20px;">Kongsikan port tersembunyi yang belum ramai tahu.</p>
+      <div style="margin-bottom:14px;">
+        <label style="display:block;font-size:.84rem;font-weight:700;margin-bottom:6px;">Nama Tempat</label>
+        <input type="text" id="gem-input-name" class="search-bar-glass" style="width:100%;" placeholder="Contoh: Port Kopi Bawah Pokok Sena">
+      </div>
+      <div style="margin-bottom:20px;">
+        <label style="display:block;font-size:.84rem;font-weight:700;margin-bottom:6px;">Keistimewaan & Tips</label>
+        <textarea id="gem-input-reason" class="search-bar-glass" style="width:100%;height:95px;border-radius:18px;" placeholder="Ceritakan kenapa tempat ini istimewa..."></textarea>
+      </div>
+      <button class="pill-btn-fresh sky" style="width:100%;justify-content:center;padding:14px;" onclick="submitNewGem()"><i class="fa-solid fa-paper-plane"></i> Hantar Cadangan</button>
+    </div>
+  </div>
+
+  <!-- ===================== FIREBASE MODULE ===================== -->
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+    import { getAnalytics } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-analytics.js";
+    import {
+      getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword,
+      signOut, sendPasswordResetEmail, updateProfile, onAuthStateChanged
+    } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+    import {
+      getDatabase, ref, onValue
+    } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-database.js";
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyD6LlhanCK_B-PmIgigkUBiHLbesNlbjns",
+      authDomain: "taipinglocalexplorer1.firebaseapp.com",
+      databaseURL: "https://taipinglocalexplorer1-default-rtdb.asia-southeast1.firebasedatabase.app",
+      projectId: "taipinglocalexplorer1",
+      storageBucket: "taipinglocalexplorer1.firebasestorage.app",
+      messagingSenderId: "132803064450",
+      appId: "1:132803064450:web:45cea4b84c92969e66ba9b",
+      measurementId: "G-3TNY8X89WB"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    try { getAnalytics(app); } catch(e) {}
+    const auth = getAuth(app);
+    const db = getDatabase(app);
+
+    // ===== PENTING: Expose ke window supaya script biasa boleh akses =====
+    window.firebaseAuth = auth;
+    window.firebaseDB = db;
+    window.firebaseRef = ref;
+    window.firebaseOnValue = onValue;
+
+    // ===== Auth Listener =====
+    onAuthStateChanged(auth, (user) => {
+      if (user) {
+        window.APP_STATE.currentUser = {
+          name: user.displayName || user.email.split('@')[0],
+          email: user.email,
+          uid: user.uid
+        };
+      } else {
+        window.APP_STATE.currentUser = null;
+      }
+      if (typeof window.syncUserSessionUI === 'function') window.syncUserSessionUI();
+    });
+
+    // ===== Auth Handlers =====
+    window.handleFormRegister = async function(e) {
+      e.preventDefault();
+      window.playPopSound(500);
+      const name = document.getElementById("reg-name").value.trim();
+      const email = document.getElementById("reg-email").value.trim().toLowerCase();
+      const pwd = document.getElementById("reg-password").value;
+      const confirmPwd = document.getElementById("reg-confirm-password").value;
+      const btn = document.getElementById("btn-submit-reg");
+      if (pwd !== confirmPwd) { window.showToast("Kata laluan tidak sepadan!"); return; }
+      btn.disabled = true;
+      btn.querySelector("span").textContent = "Mendaftar...";
+      try {
+        const uc = await createUserWithEmailAndPassword(auth, email, pwd);
+        await updateProfile(uc.user, { displayName: name });
+        window.closeAuthModal();
+        window.triggerCelebrationParticles();
+        window.showToast(`🎉 Selamat datang, ${name}!`);
+      } catch (err) {
+        let msg = "Ralat pendaftaran.";
+        if (err.code === "auth/email-already-in-use") msg = "Emel sudah berdaftar. Sila log masuk!";
+        else if (err.code === "auth/weak-password") msg = "Kata laluan terlalu lemah.";
+        else if (err.code === "auth/invalid-email") msg = "Format emel tidak sah.";
+        window.showToast(msg);
+      } finally {
+        btn.disabled = false;
+        btn.querySelector("span").textContent = "Cipta Akaun";
+      }
+    };
+
+    window.handleFormLogin = async function(e) {
+      e.preventDefault();
+      window.playPopSound(520);
+      const email = document.getElementById("login-email").value.trim().toLowerCase();
+      const pwd = document.getElementById("login-password").value;
+      const btn = document.getElementById("btn-submit-login");
+      btn.disabled = true;
+      btn.querySelector("span").textContent = "Mengesahkan...";
+      try {
+        const uc = await signInWithEmailAndPassword(auth, email, pwd);
+        window.closeAuthModal();
+        window.triggerCelebrationParticles();
+        window.showToast(`Selamat kembali, ${uc.user.displayName || email.split("@")[0]}!`);
+      } catch (err) {
+        let msg = "Emel atau kata laluan tidak tepat.";
+        if (err.code === "auth/too-many-requests") msg = "Terlalu banyak percubaan. Cuba sebentar lagi.";
+        else if (err.code === "auth/network-request-failed") msg = "Ralat rangkaian.";
+        window.showToast(msg);
+      } finally {
+        btn.disabled = false;
+        btn.querySelector("span").textContent = "Log Masuk";
+      }
+    };
+
+    window.handleRequestPasswordReset = async function(e) {
+      e.preventDefault();
+      window.playPopSound(440);
+      const email = document.getElementById("reset-email").value.trim().toLowerCase();
+      const btn = document.getElementById("btn-submit-reset");
+      btn.disabled = true;
+      btn.querySelector("span").textContent = "Menghantar...";
+      try {
+        await sendPasswordResetEmail(auth, email);
+        window.showToast("Pautan reset telah dihantar ke emel anda!");
+        setTimeout(() => { window.switchAuthFlow('login'); document.getElementById("login-email").value = email; }, 1200);
+      } catch (err) {
+        let msg = "Ralat menghantar emel.";
+        if (err.code === "auth/user-not-found") msg = "Tiada akaun dengan emel tersebut.";
+        window.showToast(msg);
+      } finally {
+        btn.disabled = false;
+        btn.querySelector("span").textContent = "Hantar Pautan Reset";
+      }
+    };
+
+    window.performLogout = async function() {
+      try {
+        await signOut(auth);
+        window.playPopSound(300);
+        window.showToast("Anda telah berjaya log keluar.");
+      } catch (err) {
+        window.showToast("Ralat semasa log keluar.");
+      }
+    };
+
+    // Signal kepada script biasa bahawa Firebase sedia
+    window.dispatchEvent(new Event('firebase-ready'));
+  </script>
+
+  <!-- ===================== MAIN APP SCRIPT ===================== -->
+  <script>
+    // ===== STATE =====
+    const APP_STATE = {
+      theme: "light", lang: "ms", activeTab: "home",
+      userGps: { lat: 4.8569, lng: 100.7497 },
+      savedIds: [], stamps: [], activeItem: null,
+      currentStreetViewPlace: null,
+      currentGoogleViewMode: 'streetview',
+      weatherIndex: 0, currentUser: null, synth: null,
+      liveDestinations: [],
+      weatherModes: [
+        { temp: "25°C", desc: "Cerah & Segar di Tasik", icon: "fa-cloud-sun" },
+        { temp: "23°C", desc: "Hujan Renyai (Bandar Hujan)", icon: "fa-cloud-rain" },
+        { temp: "18°C", desc: "Kabus Dingin di Bukit Larut", icon: "fa-smog" }
+      ]
+    };
+    window.APP_STATE = APP_STATE;
+
+    // ===== FALLBACK DATA (jika Firebase gagal) =====
+    const APP_DB_FALLBACK = {
+      destinations: [
+        { id:"dest_lake_gardens", name:"Taman Tasik Taiping", category:"nature", categoryColor:"#10b981", icon:"fa-leaf", isFeatured:true, image:"https://images.unsplash.com/photo-1544735716-392fe2489ffa?auto=format&fit=crop&w=900&q=80", rating:4.9, price:"Percuma / Free", coords:[4.8569,100.7497], desc:"Taman awam terawal di Malaysia (1880).", hours:"6:00 AM - 10:00 PM", tips:"Waktu pagi terbaik untuk fotografi." },
+        { id:"dest_perak_museum", name:"Muzium Perak Taiping", category:"heritage", categoryColor:"#f59e0b", icon:"fa-landmark", isFeatured:true, image:"https://images.unsplash.com/photo-1582555172866-f73bb12a2ab3?auto=format&fit=crop&w=900&q=80", rating:4.8, price:"Dewasa RM5", coords:[4.8608,100.7456], desc:"Muzium tertua di Semenanjung Malaysia (1883).", hours:"9:00 AM - 5:00 PM", tips:"Sesuai dilawati ketika hujan petang." },
+        { id:"dest_bukit_larut", name:"Bukit Larut (Maxwell Hill)", category:"nature", categoryColor:"#10b981", icon:"fa-mountain-sun", isFeatured:true, image:"https://images.unsplash.com/photo-1506744038136-46273834b3fb?auto=format&fit=crop&w=900&q=80", rating:4.8, price:"Percuma (Hiking)", coords:[4.8622,100.7925], desc:"Stesen bukit tertua di Malaysia (1,250m).", hours:"7:00 AM - 6:00 PM", tips:"Bawa jaket ringan." },
+        { id:"dest_zoo_taiping", name:"Zoo Taiping & Night Safari", category:"family", categoryColor:"#6366f1", icon:"fa-paw", isFeatured:true, image:"https://images.unsplash.com/photo-1534188753412-3e26d0d618d6?auto=format&fit=crop&w=900&q=80", rating:4.8, price:"Dewasa RM16", coords:[4.8564,100.7501], desc:"Zoo seluas 36 ekar dengan Night Safari.", hours:"8:30 AM - 6:00 PM", tips:"Night Safari sangat menyeronokkan." },
+        { id:"dest_antong_coffee", name:"Kilang Kopi Antong (1933)", category:"heritage", categoryColor:"#f59e0b", icon:"fa-mug-hot", isFeatured:true, image:"https://images.unsplash.com/photo-1501339847302-ac426a4a7cbb?auto=format&fit=crop&w=900&q=80", rating:4.9, price:"Masuk Percuma", coords:[4.8522,100.7308], desc:"Kilang kopi kayu arang tertua di Malaysia.", hours:"8:30 AM - 5:30 PM", tips:"Cuba sampel kopi segar percuma." },
+        { id:"dest_kaki_puteh", name:"Kaki Puteh Cafe & Roastery", category:"cafe", categoryColor:"#ec4899", icon:"fa-mug-saucer", isFeatured:true, image:"https://images.unsplash.com/photo-1554118811-1e0d58224f24?auto=format&fit=crop&w=900&q=80", rating:4.9, price:"RM 12 - RM 28", coords:[4.8535,100.7428], desc:"Kafe artisanal dengan kopi pour-over.", hours:"9:00 AM - 7:00 PM", tips:"Sudut tingkap terbaik untuk foto." },
+        { id:"dest_ansari_cendol", name:"Ansari Famous Cendol (1940)", category:"food", categoryColor:"#f43f5e", icon:"fa-bowl-food", isFeatured:true, image:"https://images.unsplash.com/photo-1563805042-7684c019e1cb?auto=format&fit=crop&w=900&q=80", rating:4.8, price:"RM 3.50 - RM 6.50", coords:[4.8541,100.7420], desc:"Cendol pulut legasi lebih 80 tahun.", hours:"10:30 AM - 6:30 PM", tips:"Nikmati dengan pasembur kuah kacang." },
+        { id:"dest_burmese_pool", name:"Burmese Pool (Kolam Burma)", category:"nature", categoryColor:"#10b981", icon:"fa-water", isFeatured:false, image:"https://images.unsplash.com/photo-1432405972618-c60b0225b8f9?auto=format&fit=crop&w=900&q=80", rating:4.7, price:"Percuma / Free", coords:[4.8580,100.7621], desc:"Kolam sungai berbatu semula jadi.", hours:"7:00 AM - 6:30 PM", tips:"Elakkan mandi jika hujan lebat." }
+      ],
+      checkpoints: [
+        { key: "tasik", name: "Taman Tasik", icon: "fa-tree" },
+        { key: "muzium", name: "Muzium Perak", icon: "fa-landmark" },
+        { key: "bukit_larut", name: "Bukit Larut", icon: "fa-mountain-sun" },
+        { key: "zoo", name: "Zoo Taiping", icon: "fa-paw" },
+        { key: "antong", name: "Kopi Antong", icon: "fa-mug-hot" },
+        { key: "burmese", name: "Burmese Pool", icon: "fa-water" }
+      ]
+    };
+
+    // ===== GETTER (live atau fallback) =====
+    function getDestinations() {
+      return (APP_STATE.liveDestinations && APP_STATE.liveDestinations.length > 0)
+        ? APP_STATE.liveDestinations
+        : APP_DB_FALLBACK.destinations;
+    }
+
+    // ===== TONE.JS SOUND =====
+    function playPopSound(freq = 440) {
+      const toggle = document.getElementById("toggle-sound-fx");
+      if (toggle && !toggle.checked) return;
+      try {
+        if (!APP_STATE.synth && window.Tone) {
+          APP_STATE.synth = new Tone.Synth({
+            oscillator: { type: "sine" },
+            envelope: { attack: 0.005, decay: 0.08, sustain: 0, release: 0.08 }
+          }).toDestination();
+          APP_STATE.synth.volume.value = -12;
+        }
+        if (APP_STATE.synth) {
+          if (Tone.context.state !== 'running') Tone.start();
+          APP_STATE.synth.triggerAttackRelease(freq, "32n");
+        }
+      } catch(e) {}
+    }
+    window.playPopSound = playPopSound;
+
+    // ===== CONFETTI =====
+    function triggerCelebrationParticles() {
+      const canvas = document.getElementById("celebration-canvas");
+      if (!canvas) return;
+      const ctx = canvas.getContext("2d");
+      canvas.width = window.innerWidth;
+      canvas.height = window.innerHeight;
+      const particles = [];
+      const colors = ["#0284c7", "#10b981", "#f59e0b", "#ec4899", "#38bdf8", "#ea4335"];
+      for (let i = 0; i < 70; i++) {
+        particles.push({
+          x: canvas.width/2, y: canvas.height/2,
+          vx: (Math.random()-.5)*16, vy: (Math.random()-.5)*16-3,
+          size: Math.random()*8+4,
+          color: colors[Math.floor(Math.random()*colors.length)],
+          rotation: Math.random()*360, vRot: (Math.random()-.5)*10, alpha: 1
+        });
+      }
+      function animate() {
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        let active = 0;
+        particles.forEach(p => {
+          p.x += p.vx; p.y += p.vy; p.vy += .35; p.alpha -= .015; p.rotation += p.vRot;
+          if (p.alpha > 0) {
+            active++;
+            ctx.save(); ctx.globalAlpha = p.alpha;
+            ctx.translate(p.x, p.y); ctx.rotate((p.rotation*Math.PI)/180);
+            ctx.fillStyle = p.color;
+            ctx.fillRect(-p.size/2, -p.size/2, p.size, p.size);
+            ctx.restore();
+          }
+        });
+        if (active > 0) requestAnimationFrame(animate);
+        else ctx.clearRect(0, 0, canvas.width, canvas.height);
+      }
+      requestAnimationFrame(animate);
+    }
+    window.triggerCelebrationParticles = triggerCelebrationParticles;
+
+    // ===== TOAST =====
+    function showToast(msg) {
+      playPopSound(540);
+      const toast = document.getElementById("global-toast");
+      document.getElementById("toast-text").textContent = msg;
+      toast.classList.add("show");
+      setTimeout(() => toast.classList.remove("show"), 2800);
+    }
+    window.showToast = showToast;
+
+    // ===== AUTH UI =====
+    function syncUserSessionUI() {
+      const headerBtn = document.getElementById("header-auth-btn");
+      const headerLabel = document.getElementById("header-auth-label");
+      const headerIcon = document.getElementById("header-auth-icon");
+      const passportName = document.getElementById("passport-user-name");
+      const passportEmail = document.getElementById("passport-user-email");
+      const guestCard = document.getElementById("profile-guest-card");
+      const loggedCard = document.getElementById("profile-logged-card");
+      const loggedName = document.getElementById("logged-user-fullname");
+      const loggedEmail = document.getElementById("logged-user-email");
+      const avatarText = document.getElementById("user-avatar-text");
+      if (APP_STATE.currentUser) {
+        const u = APP_STATE.currentUser;
+        headerLabel.textContent = u.name.split(" ")[0];
+        headerIcon.className = "fa-solid fa-circle-user";
+        headerBtn.classList.add("user-pill-btn");
+        passportName.textContent = u.name;
+        passportEmail.textContent = u.email;
+        guestCard.style.display = "none";
+        loggedCard.style.display = "block";
+        loggedName.textContent = u.name;
+        loggedEmail.textContent = u.email;
+        avatarText.textContent = u.name.charAt(0).toUpperCase();
+      } else {
+        headerLabel.textContent = "Log Masuk";
+        headerIcon.className = "fa-regular fa-user";
+        headerBtn.classList.remove("user-pill-btn");
+        passportName.textContent = "Pengembara Tetamu";
+        passportEmail.textContent = "(Mod Tetamu — Sila daftar akaun)";
+        guestCard.style.display = "block";
+        loggedCard.style.display = "none";
+      }
+    }
+    window.syncUserSessionUI = syncUserSessionUI;
+
+    function handleHeaderAuthClick() {
+      playPopSound(480);
+      if (APP_STATE.currentUser) switchDockTab("profile");
+      else openAuthModal("login");
+    }
+    window.handleHeaderAuthClick = handleHeaderAuthClick;
+
+    function openAuthModal(flow = 'login') {
+      playPopSound(500);
+      document.getElementById("auth-modal-sheet").classList.add("open");
+      switchAuthFlow(flow);
+    }
+    window.openAuthModal = openAuthModal;
+
+    function closeAuthModal() {
+      playPopSound(260);
+      document.getElementById("auth-modal-sheet").classList.remove("open");
+    }
+    window.closeAuthModal = closeAuthModal;
+
+    function switchAuthFlow(flow) {
+      playPopSound(420);
+      ['login', 'register', 'reset'].forEach(f => {
+        const el = document.getElementById("auth-flow-" + f);
+        const btn = document.getElementById("auth-tab-btn-" + f);
+        if (el) el.classList.remove("active");
+        if (btn) btn.classList.remove("active");
+      });
+      const targetEl = document.getElementById("auth-flow-" + flow);
+      const targetBtn = document.getElementById("auth-tab-btn-" + flow);
+      if (targetEl) targetEl.classList.add("active");
+      if (targetBtn) targetBtn.classList.add("active");
+      const headline = document.getElementById("auth-modal-headline");
+      const subline = document.getElementById("auth-modal-subline");
+      if (flow === 'login') { headline.textContent = "Log Masuk Pengembara"; subline.textContent = "Masukkan emel dan kata laluan."; }
+      else if (flow === 'register') { headline.textContent = "Daftar Akaun Baru"; subline.textContent = "Sertai komuniti penjelajah Taiping 2026."; }
+      else { headline.textContent = "Lupa Kata Laluan?"; subline.textContent = "Tetapkan semula dengan pautan emel."; }
+    }
+    window.switchAuthFlow = switchAuthFlow;
+
+    function togglePasswordVisibility(inputId, btn) {
+      playPopSound(350);
+      const input = document.getElementById(inputId);
+      const icon = btn.querySelector("i");
+      if (input.type === "password") { input.type = "text"; icon.className = "fa-regular fa-eye-slash"; }
+      else { input.type = "password"; icon.className = "fa-regular fa-eye"; }
+    }
+    window.togglePasswordVisibility = togglePasswordVisibility;
+
+    // ===== DISTANCE =====
+    function calcDistanceKm(lat1, lon1, lat2, lon2) {
+      const R = 6371;
+      const dLat = (lat2-lat1)*Math.PI/180;
+      const dLon = (lon2-lon1)*Math.PI/180;
+      const a = Math.sin(dLat/2)*Math.sin(dLat/2) +
+                Math.cos(lat1*Math.PI/180)*Math.cos(lat2*Math.PI/180) *
+                Math.sin(dLon/2)*Math.sin(dLon/2);
+      return (R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a))).toFixed(1);
+    }
+
+    // ===== CARD RENDER =====
+    function createCardHtml(item) {
+      const isSaved = APP_STATE.savedIds.includes(item.id);
+      const coords = Array.isArray(item.coords) ? item.coords : [4.8569, 100.7497];
+      const dist = calcDistanceKm(APP_STATE.userGps.lat, APP_STATE.userGps.lng, coords[0], coords[1]);
+      return `
+        <article class="editorial-travel-card" onclick="openDetail('${item.id}')">
+          <div class="card-photo-wrapper">
+            <img class="card-photo-img" src="${item.image}" alt="${item.name}" loading="lazy" onerror="this.src='https://via.placeholder.com/400x200?text=No+Image'">
+            <div class="card-tag-pill" style="background:${item.categoryColor||'#0f172a'}cc;">${item.category}</div>
+            <div class="card-distance-badge"><i class="fa-solid fa-location-arrow" style="color:var(--sky-primary);"></i> ${dist} km</div>
+            <button class="card-bookmark-btn ${isSaved?'saved':''}" onclick="toggleBookmark(event, '${item.id}')">
+              <i class="fa-${isSaved?'solid':'regular'} fa-bookmark"></i>
+            </button>
+          </div>
+          <div class="card-content-body">
+            <div class="card-meta-line">
+              <div class="rating-pill-gold"><i class="fa-solid fa-star"></i> ${item.rating}</div>
+              <div style="font-size:.75rem;color:var(--text-subtle);"><i class="fa-regular fa-clock"></i> ${item.hours}</div>
+            </div>
+            <h3 class="card-title-h3">${item.name}</h3>
+            <p class="card-desc-snippet">${item.desc}</p>
+            <div class="card-foot-line">
+              <span class="card-price-txt">${item.price}</span>
+              <span class="card-tap-detail">Lihat Butiran <i class="fa-solid fa-arrow-right"></i></span>
+            </div>
+          </div>
+        </article>`;
+    }
+
+    function renderHomeCards(items = null) {
+      const container = document.getElementById("home-featured-grid");
+      if (!container) return;
+      const list = items || getDestinations().filter(d => d.isFeatured);
+      container.innerHTML = list.length ? list.map(createCardHtml).join("") :
+        `<div style="grid-column:1/-1;text-align:center;padding:40px;color:var(--text-muted);"><i class="fa-solid fa-inbox" style="font-size:2rem;opacity:.4;display:block;margin-bottom:10px;"></i>Tiada destinasi pilihan.</div>`;
+    }
+
+    function renderExploreCards(items = null) {
+      const container = document.getElementById("explore-directory-grid");
+      if (!container) return;
+      const list = items || getDestinations();
+      container.innerHTML = list.map(createCardHtml).join("");
+    }
+
+    function renderSavedCards() {
+      const container = document.getElementById("saved-bookmarks-grid");
+      if (!container) return;
+      const savedList = getDestinations().filter(d => APP_STATE.savedIds.includes(d.id));
+      if (savedList.length === 0) {
+        container.innerHTML = `<div style="grid-column:1/-1;text-align:center;padding:50px 20px;color:var(--text-muted);">
+          <i class="fa-regular fa-bookmark" style="font-size:3rem;opacity:.3;margin-bottom:12px;display:block;"></i>
+          <h3 style="font-weight:700;margin-bottom:6px;">Belum Ada Tempat Disimpan</h3>
+          <p style="font-size:.86rem;">Tekan ikon bookmark pada kad untuk menyimpannya.</p></div>`;
+        return;
+      }
+      container.innerHTML = savedList.map(createCardHtml).join("");
+    }
+
+    // ===== SEARCH & FILTER =====
+    function handleLiveSearch(query) {
+      const q = query.toLowerCase().trim();
+      if (!q) { renderHomeCards(); return; }
+      const filtered = getDestinations().filter(d =>
+        (d.name||'').toLowerCase().includes(q) ||
+        (d.desc||'').toLowerCase().includes(q) ||
+        (d.category||'').toLowerCase().includes(q));
+      renderHomeCards(filtered);
+    }
+    window.handleLiveSearch = handleLiveSearch;
+
+    function executeSearchAction() {
+      playPopSound(460);
+      handleLiveSearch(document.getElementById("home-search-box").value);
+    }
+    window.executeSearchAction = executeSearchAction;
+
+    function filterByHomeCategory(cat, btn) {
+      playPopSound(380);
+      document.querySelectorAll("#home-categories-strip .category-pill").forEach(p => p.classList.remove("active"));
+      btn.classList.add("active");
+      if (cat === "all") renderHomeCards();
+      else renderHomeCards(getDestinations().filter(d => d.category === cat));
+    }
+    window.filterByHomeCategory = filterByHomeCategory;
+
+    function applyExploreDirectoryFilters() {
+      playPopSound(400);
+      const cat = document.getElementById("explore-filter-cat").value;
+      const sort = document.getElementById("explore-sort-type").value;
+      let list = [...getDestinations()];
+      if (cat !== "all") list = list.filter(d => d.category === cat);
+      if (sort === "rating") list.sort((a,b) => b.rating - a.rating);
+      else if (sort === "distance") list.sort((a,b) => {
+        const dA = calcDistanceKm(APP_STATE.userGps.lat, APP_STATE.userGps.lng, a.coords[0], a.coords[1]);
+        const dB = calcDistanceKm(APP_STATE.userGps.lat, APP_STATE.userGps.lng, b.coords[0], b.coords[1]);
+        return dA - dB;
+      });
+      else if (sort === "free") list = list.filter(d => (d.price||'').toLowerCase().includes("percuma") || (d.price||'').toLowerCase().includes("free"));
+      renderExploreCards(list);
+    }
+    window.applyExploreDirectoryFilters = applyExploreDirectoryFilters;
+
+    function sortByNearGps() {
+      playPopSound(420);
+      const sorted = [...getDestinations()].sort((a,b) => {
+        const dA = calcDistanceKm(APP_STATE.userGps.lat, APP_STATE.userGps.lng, a.coords[0], a.coords[1]);
+        const dB = calcDistanceKm(APP_STATE.userGps.lat, APP_STATE.userGps.lng, b.coords[0], b.coords[1]);
+        return dA - dB;
+      });
+      renderHomeCards(sorted);
+      showToast("Disusun mengikut jarak paling dekat.");
+    }
+    window.sortByNearGps = sortByNearGps;
+
+    function toggleBookmark(e, id) {
+      e.stopPropagation();
+      playPopSound(600);
+      const idx = APP_STATE.savedIds.indexOf(id);
+      if (idx > -1) { APP_STATE.savedIds.splice(idx, 1); showToast("Dikeluarkan daripada tersimpan."); }
+      else { APP_STATE.savedIds.push(id); showToast("Disimpan ke senarai Saved!"); }
+      localStorage.setItem("taiping_saved_ids", JSON.stringify(APP_STATE.savedIds));
+      renderHomeCards();
+      if (APP_STATE.activeTab === "saved") renderSavedCards();
+      if (APP_STATE.activeTab === "explore") renderExploreCards();
+    }
+    window.toggleBookmark = toggleBookmark;
+
+    // ===== DETAIL SHEET =====
+    function openDetail(id) {
+      playPopSound(460);
+      const item = getDestinations().find(d => d.id === id);
+      if (!item) return;
+      APP_STATE.activeItem = item;
+      document.getElementById("detail-img").src = item.image;
+      document.getElementById("detail-category-badge").textContent = (item.category||'').toUpperCase();
+      document.getElementById("detail-title").textContent = item.name;
+      document.getElementById("detail-rating").textContent = "★ " + item.rating;
+      document.getElementById("detail-price").textContent = item.price;
+      document.getElementById("detail-desc").textContent = item.desc;
+      document.getElementById("detail-hours").textContent = item.hours;
+      document.getElementById("detail-tips").textContent = item.tips;
+      const coords = Array.isArray(item.coords) ? item.coords : [4.8569, 100.7497];
+      const dist = calcDistanceKm(APP_STATE.userGps.lat, APP_STATE.userGps.lng, coords[0], coords[1]);
+      document.getElementById("detail-distance").textContent = `${dist} km dari lokasi semasa`;
+      document.getElementById("detail-sheet").classList.add("open");
+    }
+    window.openDetail = openDetail;
+
+    function closeDetailSheet() {
+      playPopSound(260);
+      document.getElementById("detail-sheet").classList.remove("open");
+      APP_STATE.activeItem = null;
+    }
+    window.closeDetailSheet = closeDetailSheet;
+
+    function viewDetailPlaceInStreetView() {
+      if (!APP_STATE.activeItem) return;
+      const id = APP_STATE.activeItem.id;
+      closeDetailSheet();
+      switchDockTab('map');
+      setTimeout(() => loadStreetViewHotspot(id), 300);
+    }
+    window.viewDetailPlaceInStreetView = viewDetailPlaceInStreetView;
+
+    function openGoogleMapsDirection() {
+      playPopSound(500);
+      if (!APP_STATE.activeItem) return;
+      const c = APP_STATE.activeItem.coords || [4.8569, 100.7497];
+      window.open(`https://www.google.com/maps/dir/?api=1&destination=${c[0]},${c[1]}`, "_blank");
+    }
+    window.openGoogleMapsDirection = openGoogleMapsDirection;
+
+    function sharePlaceDetails() {
+      playPopSound(540);
+      if (!APP_STATE.activeItem) return;
+      const text = encodeURIComponent(`Jom teroka ${APP_STATE.activeItem.name} di Taiping!`);
+      window.open(`https://wa.me/?text=${text}`, "_blank");
+    }
+    window.sharePlaceDetails = sharePlaceDetails;
+
+    // ===== STREET VIEW =====
+    function getStreetViewEmbedUrl(lat, lng, mode, placeName = "") {
+      if (mode === 'streetview') return `https://maps.google.com/maps?layer=c&cbll=${lat},${lng}&source=embed&output=svembed`;
+      const q = encodeURIComponent(`${placeName} Taiping Perak`);
+      if (mode === 'satellite') return `https://maps.google.com/maps?q=${q}&t=k&z=16&output=embed`;
+      return `https://maps.google.com/maps?q=${q}&z=16&output=embed`;
+    }
+
+    function renderStreetViewHotspots() {
+      const bar = document.getElementById("streetview-hotspots-bar");
+      if (!bar) return;
+      const dests = getDestinations().slice(0, 7);
+      if (dests.length === 0) { bar.innerHTML = ''; return; }
+      bar.innerHTML = dests.map((d, i) => 
+        `<button class="category-pill ${i===0?'active-sv':''}" style="padding:7px 15px;font-size:.78rem;" onclick="loadStreetViewHotspot('${d.id}', this)">${d.name.split(' ').slice(0,2).join(' ')}</button>`
+      ).join('');
+    }
+
+    function loadStreetViewHotspot(destId, clickedBtn = null) {
+      playPopSound(480);
+      const dests = getDestinations();
+      const place = dests.find(d => d.id === destId) || dests[0];
+      if (!place) return;
+      APP_STATE.currentStreetViewPlace = place;
+      if (clickedBtn) {
+        document.querySelectorAll("#streetview-hotspots-bar .category-pill").forEach(p => p.classList.remove("active-sv"));
+        clickedBtn.classList.add("active-sv");
+      }
+      document.getElementById("sv-current-placename").textContent = place.name;
+      const coords = Array.isArray(place.coords) ? place.coords : [4.8569, 100.7497];
+      document.getElementById("google-sv-viewport").src = getStreetViewEmbedUrl(coords[0], coords[1], APP_STATE.currentGoogleViewMode, place.name);
+      document.getElementById("btn-open-full-google").href = `https://www.google.com/maps/@?api=1&map_action=pano&viewpoint=${coords[0]},${coords[1]}`;
+      showToast(`Memuatkan: ${place.name}`);
+    }
+    window.loadStreetViewHotspot = loadStreetViewHotspot;
+
+    function switchGoogleViewMode(mode) {
+      playPopSound(450);
+      APP_STATE.currentGoogleViewMode = mode;
+      const place = APP_STATE.currentStreetViewPlace || getDestinations()[0];
+      if (!place) return;
+      const btnSv = document.getElementById("btn-mode-sv");
+      const btnMap = document.getElementById("btn-mode-map");
+      const btnSat = document.getElementById("btn-mode-sat");
+      [btnSv, btnMap, btnSat].forEach(b => b.className = "pill-btn-fresh white");
+      if (mode === 'streetview') btnSv.className = "pill-btn-fresh google-red";
+      else if (mode === 'map') btnMap.className = "pill-btn-fresh sky";
+      else btnSat.className = "pill-btn-fresh mint";
+      const coords = Array.isArray(place.coords) ? place.coords : [4.8569, 100.7497];
+      document.getElementById("google-sv-viewport").src = getStreetViewEmbedUrl(coords[0], coords[1], mode, place.name);
+    }
+    window.switchGoogleViewMode = switchGoogleViewMode;
+
+    // ===== PASSPORT =====
+    function renderPassportGrid() {
+      const grid = document.getElementById("profile-stamps-grid");
+      if (!grid) return;
+      grid.innerHTML = APP_DB_FALLBACK.checkpoints.map(cp => {
+        const isStamped = APP_STATE.stamps.includes(cp.key);
+        return `<div style="aspect-ratio:1;border-radius:18px;border:2px dashed ${isStamped?'var(--mint-accent)':'rgba(255,255,255,.22)'};background:${isStamped?'rgba(16,185,129,.22)':'rgba(255,255,255,.06)'};display:flex;flex-direction:column;align-items:center;justify-content:center;padding:8px;text-align:center;">
+          <i class="fa-solid ${cp.icon}" style="font-size:1.4rem;color:${isStamped?'var(--mint-accent)':'rgba(255,255,255,.5)'};margin-bottom:5px;"></i>
+          <span style="font-size:.72rem;font-weight:700;color:#fff;">${cp.name}</span>
+          ${isStamped?'<span style="font-size:.58rem;color:var(--mint-accent);font-weight:800;margin-top:2px;">DICOP</span>':''}
+        </div>`;
+      }).join("");
+      const total = APP_STATE.stamps.length;
+      document.getElementById("stamp-count-display").textContent = total;
+      const rank = document.getElementById("user-rank-badge");
+      if (total >= 5) rank.textContent = "Tahap 3: Master Taiping 👑";
+      else if (total >= 2) rank.textContent = "Tahap 2: Pengembara Setia 🌿";
+      else rank.textContent = "Tahap 1: Novis Alam 🎒";
+    }
+
+    function openCheckInSheet() { playPopSound(480); document.getElementById("checkin-sheet").classList.add("open"); }
+    window.openCheckInSheet = openCheckInSheet;
+    function closeCheckInSheet() { playPopSound(260); document.getElementById("checkin-sheet").classList.remove("open"); }
+    window.closeCheckInSheet = closeCheckInSheet;
+
+    function claimDigitalStamp() {
+      const key = document.getElementById("select-checkpoint").value;
+      if (APP_STATE.stamps.includes(key)) {
+        playPopSound(320);
+        showToast("Anda sudah menebus cop ini!");
+        closeCheckInSheet();
+        return;
+      }
+      playPopSound(650);
+      APP_STATE.stamps.push(key);
+      localStorage.setItem("taiping_passport_stamps", JSON.stringify(APP_STATE.stamps));
+      renderPassportGrid();
+      closeCheckInSheet();
+      triggerCelebrationParticles();
+      showToast("🎉 Cop Pasport Berjaya Disahkan!");
+    }
+    window.claimDigitalStamp = claimDigitalStamp;
+
+    function openSuggestGemSheet() { playPopSound(460); document.getElementById("suggest-gem-sheet").classList.add("open"); }
+    window.openSuggestGemSheet = openSuggestGemSheet;
+    function closeSuggestGemSheet() { playPopSound(260); document.getElementById("suggest-gem-sheet").classList.remove("open"); }
+    window.closeSuggestGemSheet = closeSuggestGemSheet;
+
+    function submitNewGem() {
+      const name = document.getElementById("gem-input-name").value.trim();
+      if (!name) { showToast("Sila masukkan nama tempat!"); return; }
+      playPopSound(580);
+      closeSuggestGemSheet();
+      document.getElementById("gem-input-name").value = "";
+      document.getElementById("gem-input-reason").value = "";
+      triggerCelebrationParticles();
+      showToast("Terima kasih! Cadangan anda telah dihantar.");
+    }
+    window.submitNewGem = submitNewGem;
+
+    // ===== DOCK TAB =====
+    function switchDockTab(tabId) {
+      playPopSound(440);
+      APP_STATE.activeTab = tabId;
+      document.querySelectorAll(".view-screen").forEach(s => s.classList.remove("active"));
+      document.querySelectorAll(".dock-tab-btn").forEach(b => b.classList.remove("active"));
+      const targetScreen = document.getElementById("view-" + tabId);
+      const targetBtn = document.getElementById("tab-" + tabId);
+      if (targetScreen) targetScreen.classList.add("active");
+      if (targetBtn) targetBtn.classList.add("active");
+      window.scrollTo({ top: 0, behavior: "smooth" });
+      if (tabId === "explore") renderExploreCards();
+      if (tabId === "map") {
+        renderStreetViewHotspots();
+        if (!APP_STATE.currentStreetViewPlace) {
+          setTimeout(() => loadStreetViewHotspot(getDestinations()[0]?.id), 200);
+        }
+      }
+      if (tabId === "saved") renderSavedCards();
+      if (tabId === "profile") { renderPassportGrid(); syncUserSessionUI(); }
+    }
+    window.switchDockTab = switchDockTab;
+
+    // ===== THEME =====
+    function toggleTheme() {
+      playPopSound(500);
+      APP_STATE.theme = APP_STATE.theme === "light" ? "dark" : "light";
+      document.body.setAttribute("data-theme", APP_STATE.theme);
+      document.getElementById("theme-btn").querySelector("i").className = APP_STATE.theme === "dark" ? "fa-solid fa-sun" : "fa-solid fa-moon";
+      localStorage.setItem("taiping_fresh_theme", APP_STATE.theme);
+      showToast(APP_STATE.theme === "dark" ? "Mod Gelap diaktifkan" : "Mod Cerah diaktifkan");
+    }
+    window.toggleTheme = toggleTheme;
+
+    function toggleLanguage() {
+      playPopSound(480);
+      APP_STATE.lang = APP_STATE.lang === "ms" ? "en" : "ms";
+      document.getElementById("lang-btn").querySelector("span").textContent = APP_STATE.lang === "ms" ? "EN" : "BM";
+      const isEn = APP_STATE.lang === "en";
+      document.getElementById("hero-greeting").textContent = isEn ? "Good Morning, Explorer!" : "Selamat Pagi, Pengembara!";
+      document.getElementById("hero-headline").textContent = isEn ? "Discover Taiping, Naturally." : "Terokai Taiping, Secara Semula Jadi.";
+      showToast(isEn ? "English activated!" : "Bahasa Melayu diaktifkan!");
+    }
+    window.toggleLanguage = toggleLanguage;
+
+    function cycleWeatherSimulation() {
+      playPopSound(420);
+      APP_STATE.weatherIndex = (APP_STATE.weatherIndex + 1) % APP_STATE.weatherModes.length;
+      const w = APP_STATE.weatherModes[APP_STATE.weatherIndex];
+      document.getElementById("weather-temp").textContent = w.temp;
+      document.getElementById("weather-desc").textContent = w.desc;
+      document.getElementById("weather-icon").className = `fa-solid ${w.icon}`;
+      showToast(`Cuaca: ${w.desc}`);
+    }
+    window.cycleWeatherSimulation = cycleWeatherSimulation;
+
+    function requestGpsUpdate() {
+      playPopSound(460);
+      if ("geolocation" in navigator) {
+        navigator.geolocation.getCurrentPosition(
+          pos => {
+            APP_STATE.userGps = { lat: pos.coords.latitude, lng: pos.coords.longitude };
+            document.getElementById("user-location-name").textContent = "Taiping (GPS Aktif)";
+            renderHomeCards();
+            showToast("Lokasi GPS dikemaskini.");
+          },
+          () => showToast("Lokasi lalai Taiping digunakan.")
+        );
+      }
+    }
+    window.requestGpsUpdate = requestGpsUpdate;
+
+    // ===== FIREBASE REALTIME LISTENER =====
+    function initRealtimeDatabaseListener() {
+      if (!window.firebaseDB || !window.firebaseRef || !window.firebaseOnValue) {
+        console.warn("⏳ Firebase belum sedia, cuba lagi...");
+        setTimeout(initRealtimeDatabaseListener, 500);
+        return;
+      }
+      const destinationsRef = window.firebaseRef(window.firebaseDB, 'destinations');
+      window.firebaseOnValue(destinationsRef, (snapshot) => {
+        const data = snapshot.val();
+        if (data && typeof data === 'object') {
+          const loaded = Object.keys(data).map(key => ({
+            ...data[key],
+            id: data[key].id || key,
+            coords: Array.isArray(data[key].coords) ? data[key].coords : [4.8569, 100.7497]
+          }));
+          APP_STATE.liveDestinations = loaded;
+          console.log(`✅ ${loaded.length} destinasi dimuatkan dari Firebase RTDB.`);
+          renderHomeCards();
+          renderStreetViewHotspots();
+          if (APP_STATE.activeTab === 'explore') renderExploreCards();
+          if (APP_STATE.activeTab === 'saved') renderSavedCards();
+        } else {
+          console.warn("⚠️ Tiada data dalam Firebase. Guna fallback.");
+          APP_STATE.liveDestinations = [];
+          renderHomeCards();
+        }
+      }, (error) => {
+        console.error("❌ Ralat RTDB:", error);
+        APP_STATE.liveDestinations = [];
+        renderHomeCards();
+      });
+    }
+
+    // ===== INIT =====
+    window.addEventListener("DOMContentLoaded", () => {
+      try {
+        const sb = localStorage.getItem("taiping_saved_ids");
+        if (sb) APP_STATE.savedIds = JSON.parse(sb);
+        const ss = localStorage.getItem("taiping_passport_stamps");
+        if (ss) APP_STATE.stamps = JSON.parse(ss);
+        const st = localStorage.getItem("taiping_fresh_theme");
+        if (st) {
+          APP_STATE.theme = st;
+          document.body.setAttribute("data-theme", st);
+          const icon = document.getElementById("theme-btn").querySelector("i");
+          if (icon) icon.className = st === "dark" ? "fa-solid fa-sun" : "fa-solid fa-moon";
+        }
+      } catch(e) { console.warn(e); }
+
+      // Close sheet on backdrop tap
+      ['auth-modal-sheet', 'detail-sheet', 'checkin-sheet', 'suggest-gem-sheet'].forEach(sid => {
+        const sheet = document.getElementById(sid);
+        if (sheet) sheet.addEventListener('click', e => {
+          if (e.target === sheet) { sheet.classList.remove('open'); playPopSound(280); }
+        });
+      });
+
+      // Initial render (fallback dulu)
+      syncUserSessionUI();
+      renderHomeCards();
+
+      // Hidden gems sample
+      const gc = document.getElementById("hidden-gems-list");
+      if (gc) {
+        gc.innerHTML = `
+          <div style="background:var(--bg-canvas);border-radius:var(--radius-md);padding:16px;border:1px solid var(--border-subtle);">
+            <div style="font-weight:800;font-size:.94rem;margin-bottom:4px;">🌿 Lorong Dahan Tasik Senyap</div>
+            <p style="font-size:.82rem;color:var(--text-muted);line-height:1.5;">Sudut tasik terpencil berdekatan bekas kediaman Residen British.</p>
+          </div>
+          <div style="background:var(--bg-canvas);border-radius:var(--radius-md);padding:16px;border:1px solid var(--border-subtle);">
+            <div style="font-weight:800;font-size:.94rem;margin-bottom:4px;">☕ Kopitiam Pokok Asam Lama</div>
+            <p style="font-size:.82rem;color:var(--text-muted);line-height:1.5;">Port sarapan pagi warga emas Taiping dengan roti kukus kaya asli.</p>
+          </div>`;
+      }
+
+      requestGpsUpdate();
+
+      // Mulakan Firebase listener
+      initRealtimeDatabaseListener();
+    });
+
+    // Safety: kalau 'firebase-ready' tercetus awal
+    window.addEventListener('firebase-ready', () => {
+      setTimeout(initRealtimeDatabaseListener, 300);
+    });
+  </script>
+</body>
+</html>
